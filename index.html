@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: black;
+            color: yellow;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, p {
+            margin: 5px;
+        }
+
+        img {
+            width: 256px;
+            height: 256px;
+            border: 2px solid lime;
+            transition: transform 0.01s ease;
+        }
+
+        #countdown {
+            font-size: 1.5em;
+            margin-top: 10px;
+            text-shadow: 0 0 5px red;
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 1;
+            }
+            20%, 24%, 55% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes flash {
+            0% { background-color: black; }
+            100% { background-color: red; }
+        }
+
+        h1 {
+            animation: flicker 1s infinite;
+        }
+
+        /* Faster flashing animation, initially not active */
+        .flashing {
+            animation: flash 0.05s infinite alternate;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>400 BAD REQUEST</h1>
+    <img id="image" src="him.gif" alt="">
+    <p id="countdown">time to go: 15 seconds</p>
+
+    <!-- Audio elements -->
+    <audio id="audio1" muted>
+        <source src="the_eyes.mp3" />
+    </audio>
+    <audio id="audio2" muted>
+        <source src="the_eyes_2.mp3" />
+    </audio>
+
+    <script>
+        window.onload = () => {
+            const audio1 = document.getElementById('audio1');
+            const audio2 = document.getElementById('audio2');
+            const image = document.getElementById('image');
+            const body = document.body;
+            
+            alert("The administrator has locked this page for viewing");
+            
+            // Play the first audio
+            audio1.muted = false;
+            const playPromise1 = audio1.play();
+            if (playPromise1 !== undefined) {
+                playPromise1.catch(error => {
+                    console.error("Audio playback failed:", error);
+                });
+            }
+
+            setTimeout(() => {
+                alert("the eyes");
+
+                // Play the second audio
+                audio2.muted = false;
+                const playPromise2 = audio2.play();
+                if (playPromise2 !== undefined) {
+                    playPromise2.catch(error => {
+                        console.error("Audio playback failed:", error);
+                    });
+                }
+
+                // Double the image size
+                image.style.transform = "scale(2.5)";
+
+                // Start the fast flashing background
+                body.classList.add('flashing');
+            }, 15 * 1000); // Trigger the second alert and actions after 15 seconds
+        };
+
+        let countdown = 15;
+        const countdownElement = document.getElementById('countdown');
+
+        const timer = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = `time to go: ${countdown} seconds`;
+
+            if (countdown === 0) {
+                clearInterval(timer);
+                countdownElement.textContent = "* * * * * * * * * ";
+            }
+        }, 1000);
+
+        window.addEventListener('beforeunload', function (event) {
+                const message = 'PRESS THE BLUE BUTTON';
+                event.returnValue = message; // Standard way to trigger prompt
+                return message; // Some browsers still require this for prompt
+        });
+    </script>
+</body>
+</html>
