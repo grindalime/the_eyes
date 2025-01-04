@@ -29,10 +29,25 @@
             transition: transform 0.01s ease;
         }
 
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: black;
+            border: none;
+            color: yellow;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+        }
+
         #countdown {
             font-size: 1.5em;
             margin-top: 10px;
             text-shadow: 0 0 5px red;
+            display: none; /* Initially hidden */
         }
 
         @keyframes flicker {
@@ -53,23 +68,22 @@
             animation: flicker 1s infinite;
         }
 
-        /* Faster flashing animation, initially not active */
         .flashing {
             animation: flash 0.05s infinite alternate;
         }
-
     </style>
 </head>
 <body>
     <h1>400 BAD REQUEST</h1>
-    <img id="image" src="him.gif" alt="">
+    <img id="image" src="broken.png" alt="Broken Image">
+    <button id="refreshButton">Refresh Image</button>
     <p id="countdown">time to go: 15 seconds</p>
 
     <!-- Audio elements -->
-    <audio id="audio1" muted>
+    <audio id="audio1" muted playsinline>
         <source src="the_eyes.mp3" />
     </audio>
-    <audio id="audio2" muted>
+    <audio id="audio2" muted playsinline>
         <source src="the_eyes_2.mp3" />
     </audio>
 
@@ -79,56 +93,67 @@
             const audio2 = document.getElementById('audio2');
             const image = document.getElementById('image');
             const body = document.body;
-            
-            alert("The administrator has locked this page for viewing");
-            
-            // Play the first audio
-            audio1.muted = false;
-            const playPromise1 = audio1.play();
-            if (playPromise1 !== undefined) {
-                playPromise1.catch(error => {
-                    console.error("Audio playback failed:", error);
-                });
-            }
+            const refreshButton = document.getElementById('refreshButton');
+            const countdownElement = document.getElementById('countdown');
 
-            setTimeout(() => {
-                alert("the eyes");
+            let countdownStarted = false;
+            let countdown = 15;
 
-                // Play the second audio
-                audio2.muted = false;
-                const playPromise2 = audio2.play();
-                if (playPromise2 !== undefined) {
-                    playPromise2.catch(error => {
-                        console.error("Audio playback failed:", error);
-                    });
+            refreshButton.addEventListener('click', () => {
+                if (!countdownStarted) {
+                    // Start countdown
+                    countdownStarted = true;
+                    countdownElement.style.display = "block";
+
+                    // Change the image source
+                    image.src = "him.gif";
+
+                    // Play the first audio
+                    audio1.muted = false;
+                    const playPromise = audio1.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.error("Audio playback failed:", error);
+                        });
+                    }
+
+                    // Start the countdown timer
+                    const timer = setInterval(() => {
+                        countdown--;
+                        countdownElement.textContent = `time to go: ${countdown} seconds`;
+
+                        if (countdown === 0) {
+                            clearInterval(timer);
+                            countdownElement.textContent = "* * * * * * * * * ";
+
+                            // Trigger the second alert and actions after the countdown ends
+                            alert("the eyes");
+
+                            // Play the second audio
+                            audio2.muted = false;
+                            const playPromise2 = audio2.play();
+                            if (playPromise2 !== undefined) {
+                                playPromise2.catch(error => {
+                                    console.error("Audio playback failed:", error);
+                                });
+                            }
+
+                            // Double the image size
+                            image.style.transform = "scale(2.5)";
+
+                            // Start the fast flashing background
+                            body.classList.add('flashing');
+                        }
+                    }, 1000);
                 }
+            });
 
-                // Double the image size
-                image.style.transform = "scale(2.5)";
-
-                // Start the fast flashing background
-                body.classList.add('flashing');
-            }, 15 * 1000); // Trigger the second alert and actions after 15 seconds
-        };
-
-        let countdown = 15;
-        const countdownElement = document.getElementById('countdown');
-
-        const timer = setInterval(() => {
-            countdown--;
-            countdownElement.textContent = `time to go: ${countdown} seconds`;
-
-            if (countdown === 0) {
-                clearInterval(timer);
-                countdownElement.textContent = "* * * * * * * * * ";
-            }
-        }, 1000);
-
-        window.addEventListener('beforeunload', function (event) {
+            window.addEventListener('beforeunload', function (event) {
                 const message = 'PRESS THE BLUE BUTTON';
                 event.returnValue = message; // Standard way to trigger prompt
                 return message; // Some browsers still require this for prompt
-        });
+            });
+        };
     </script>
 </body>
 </html>
